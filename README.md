@@ -84,7 +84,7 @@ app.listen(3000, () => {
 
 ## Callback
 
-You can also pass an optional callback function with arguments `err` and `cache`.
+You can also pass an optional callback function with arguments `err` and `cached`.
 
 The argument `cached` is an Array of filenames that have been cached (from `Object.keys(pug.cache)`).
 
