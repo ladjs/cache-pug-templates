@@ -49,7 +49,7 @@ const app = new Koa();
 const redisClient = redis.createClient();
 
 // optional (e.g. if you want to cache in non-production)
-// app.context.state.cache = true;
+// app.cache = true;
 
 // note that koa requires us to specify a
 // path name for the views directory

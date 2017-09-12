@@ -11,7 +11,7 @@ test.cb('koa', t => {
   const redisClient = redis.createClient();
 
   // optional (e.g. if you want to cache in non-production)
-  // app.context.state.cache = true;
+  // app.cache = true;
 
   const views = path.join(__dirname, 'fixtures', 'views');
 

@@ -141,8 +141,8 @@ const preCachePugViews = (app, client, views, fn) => {
 
     // only continue if `env` is production
     // or if `app.cacheViews = true` is set
-    if (app.env !== 'production' && !app.context.state.cache) {
-      debug('koa env was not production and app.context.state.cache not set');
+    if (app.env !== 'production' && !app.cache) {
+      debug('koa env was not production and app.cache not set');
       return fn();
     }
   } else {
