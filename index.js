@@ -1,3 +1,4 @@
+/* eslint no-eval: 0 */
 const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
@@ -49,7 +50,7 @@ const cacheFile = (client, filename, dir, fn) => {
             debug(`key hash existed for ${filename} but its str was missing`);
             client.del(keyHash, err => {
               if (err) return fn(err);
-              debug(`deled existing key for ${filename} and re-creating`);
+              debug(`deleted existing key for ${filename} and re-creating`);
               cacheFile(client, filename, dir, fn);
             });
             return;
@@ -57,7 +58,7 @@ const cacheFile = (client, filename, dir, fn) => {
 
           // it did exist, so we need to use it
           debug(`re-using cache for ${filename} since it was unmodified`);
-          pug.cache[filename] = compiledStr;
+          pug.cache[filename] = eval(compiledStr);
           fn();
         });
         return;
