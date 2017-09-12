@@ -7,7 +7,7 @@
 [![made with lass](https://img.shields.io/badge/made_with-lass-95CC28.svg)](https://lass.js.org)
 [![license](https://img.shields.io/github/license/ladjs/pre-cache-pug-views.svg)](<>)
 
-> Pre-cache [Pug][] templates/views for [Lad][], [Koa][], and [Express][]
+> Pre-cache [Pug][] templates/views for [Lad][], [Koa][], [Express][], and [Connect][]
 
 
 ## Table of Contents
@@ -144,3 +144,5 @@ console.log('pug cached files', Object.keys(pug.cache));
 [koa]: http://koajs.com
 
 [express]: https://expressjs.com/
+
+[connect]: https://github.com/senchalabs/connect

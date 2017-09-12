@@ -1,6 +1,7 @@
 {
   "name": "pre-cache-pug-views",
-  "description": "Pre-cache Pug templates/views for Lad, Koa, and Express",
+  "description":
+    "Pre-cache Pug templates/views for Lad, Koa, Express, and Connect",
   "version": "0.0.1",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
   "bugs": {
