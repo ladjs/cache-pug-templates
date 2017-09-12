@@ -108,6 +108,6 @@
     "space": true
   },
   "peerDependencies": {
-    "pug": "2.x"
+    "pug": "*"
   }
 }
