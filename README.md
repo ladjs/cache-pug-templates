@@ -1,13 +1,13 @@
-# pre-cache-pug-views
+# cache-pug-templates
 
-[![build status](https://img.shields.io/travis/ladjs/pre-cache-pug-views.svg)](https://travis-ci.org/ladjs/pre-cache-pug-views)
-[![code coverage](https://img.shields.io/codecov/c/github/ladjs/pre-cache-pug-views.svg)](https://codecov.io/gh/ladjs/pre-cache-pug-views)
+[![build status](https://img.shields.io/travis/ladjs/cache-pug-templates.svg)](https://travis-ci.org/ladjs/cache-pug-templates)
+[![code coverage](https://img.shields.io/codecov/c/github/ladjs/cache-pug-templates.svg)](https://codecov.io/gh/ladjs/cache-pug-templates)
 [![code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/sindresorhus/xo)
 [![styled with prettier](https://img.shields.io/badge/styled_with-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 [![made with lass](https://img.shields.io/badge/made_with-lass-95CC28.svg)](https://lass.js.org)
-[![license](https://img.shields.io/github/license/ladjs/pre-cache-pug-views.svg)](<>)
+[![license](https://img.shields.io/github/license/ladjs/cache-pug-templates.svg)](<>)
 
-> Pre-cache [Pug][] templates/views for [Lad][], [Koa][], [Express][], and [Connect][]
+> Cache [Pug][] templates for [Lad][]/[Koa][]/[Express][]/[Connect][] with [Redis][]
 
 
 ## Table of Contents
@@ -25,13 +25,13 @@
 [npm][]:
 
 ```sh
-npm install pre-cache-pug-views
+npm install cache-pug-templates
 ```
 
 [yarn][]:
 
 ```sh
-yarn add pre-cache-pug-views
+yarn add cache-pug-templates
 ```
 
 
@@ -40,10 +40,13 @@ yarn add pre-cache-pug-views
 > Koa
 
 ```js
-const preCachePugViews = require('pre-cache-pug-views');
+const cachePugTemplates = require('cache-pug-templates');
 const Koa = require('koa');
+const path = require('path');
+const redis = require('redis');
 
 const app = new Koa();
+const redisClient = redis.createClient();
 
 // optional (e.g. if you want to cache in non-production)
 // app.context.state.cache = true;
@@ -52,37 +55,47 @@ const app = new Koa();
 // path name for the views directory
 const views = path.join(__dirname, 'views');
 
-app.listen(3000, preCachePugViews(app, views));
+app.listen(3000, () => {
+  cachePugTemplates(app, redisClient, views);
+});
 ```
 
 > Express
 
 ```js
-const preCachePugViews = require('pre-cache-pug-views');
+const cachePugTemplates = require('cache-pug-templates');
 const express = require('express');
 const path = require('path');
+const redis = require('redis');
 
 const app = express();
+const redisClient = redis.createClient();
 
 // optional (by default express defaults to `./views`)
 // app.set('views', path.join(__dirname, 'views'));
 
 app.set('view engine', 'pug');
 
-app.listen(3000, preCachePugViews(app));
+app.listen(3000, () => {
+  cachePugTemplates(app, redisClient, views);
+});
 ```
 
 
 ## Callback
 
-You can also pass an optional callback to override the existing `console.error`:
+You can also pass an optional callback function with arguments `err` and `cache`.
+
+The argument `cached` is an Array of filenames that have been cached (from `Object.keys(pug.cache)`).
 
 ```js
 // ...
 
-app.listen(3000, preCachePugViews(app, err => {
-  if (err) throw err;
-  console.log('caching worked!');
+app.listen(3000, () => {
+  cachePugTemplates(app, redisClient, (err, cached) => {
+    if (err) throw err;
+    console.log(`successfully cached (${cached.length}) files`);
+  });
 });
 ```
 
@@ -93,9 +106,11 @@ Note that with Koa you'll need to pass the `views` argument as well:
 
 const views = path.join(__dirname, 'views');
 
-app.listen(3000, preCachePugViews(app, views, err => {
-  if (err) throw err;
-  console.log('caching worked!');
+app.listen(3000, () => {
+  cachePugTemplates(app, redisClient, views, (err, cached) => {
+    if (err) throw err;
+    console.log(`successfully cached (${cached.length}) files`);
+  });
 });
 ```
 
@@ -146,3 +161,5 @@ console.log('pug cached files', Object.keys(pug.cache));
 [express]: https://expressjs.com/
 
 [connect]: https://github.com/senchalabs/connect
+
+[redis]: https://redis.io/

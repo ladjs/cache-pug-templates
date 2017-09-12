@@ -2,87 +2,182 @@ const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
 const debug = require('debug')('pre-cache-pug-views');
+const async = require('async');
+const revHash = require('rev-hash');
 
-// note that we use sync methods
-// since pug itself uses sync
-const cacheDirectory = dir => {
-  const files = fs.readdirSync(dir);
-  files.forEach(file => {
-    const filePath = path.join(dir, file);
-    if (fs.statSync(filePath).isDirectory()) return cacheDirectory(filePath);
-    if (path.extname(filePath) !== '.pug')
-      return debug(`${filePath} did not have ".pug" extension`);
-    debug(`caching ${filePath}`);
-    pug.compileFile(filePath, { cache: true });
+const cacheFile = (client, filename, dir, fn) => {
+  fs.readFile(filename, 'utf8', (err, str) => {
+    if (err) return fn(err);
+
+    const hash = revHash(str);
+
+    debug(`hash for ${filename} was ${hash}`);
+
+    const key = `views:${filename}`;
+
+    // lookup the existing key for this file
+    // e.g. [ 'foo.pug': '123456' ]
+    client.get(key, (err, keyHash) => {
+      if (err) return fn(err);
+
+      debug(`${key} was found with ${keyHash}`);
+
+      // now we need to lookup the data stored for this hash
+      // [ '123456', 'compiled-pug-template-str' ]
+      if (keyHash) {
+        debug(`key hash equality is ${keyHash === hash}`);
+
+        // if there was a key hash existing
+        // then make sure that it matches
+        // otherwise delete it and start over
+        if (keyHash !== hash) {
+          debug(`hash changed for ${filename} so we are recompiling`);
+          client.del(key, err => {
+            if (err) return fn(err);
+            debug(`deleted old hash for ${filename} and starting over`);
+            cacheFile(client, filename, dir, fn);
+          });
+          return;
+        }
+
+        client.get(keyHash, (err, compiledStr) => {
+          if (err) return fn(err);
+
+          // the compiled template string did not exist
+          // so delete key hash and start over
+          if (!compiledStr) {
+            debug(`key hash existed for ${filename} but its str was missing`);
+            client.del(keyHash, err => {
+              if (err) return fn(err);
+              debug(`deled existing key for ${filename} and re-creating`);
+              cacheFile(client, filename, dir, fn);
+            });
+            return;
+          }
+
+          // it did exist, so we need to use it
+          debug(`re-using cache for ${filename} since it was unmodified`);
+          pug.cache[filename] = compiledStr;
+          fn();
+        });
+        return;
+      }
+
+      debug('compiling template with pug.compile and storing to redis');
+      const tmpl = pug.compile(str, { filename });
+      pug.cache[filename] = tmpl;
+      async.parallel(
+        [fn => client.set(key, hash, fn), fn => client.set(hash, tmpl, fn)],
+        fn
+      );
+    });
   });
 };
 
-const preCachePugViews = (app, views, fn) => {
-  return function() {
-    debug('pre-caching pug views');
+const cacheDirectory = (client, dir, fn) => {
+  fs.readdir(dir, (err, files) => {
+    if (err) return fn(err);
+    async.each(
+      files,
+      (file, fn) => {
+        const filename = path.join(dir, file);
+        fs.stat(filename, (err, stat) => {
+          if (err) return fn(err);
 
-    if (typeof views === 'function') {
-      fn = views;
-      views = undefined;
+          if (stat.isDirectory()) return cacheDirectory(client, filename, fn);
+
+          debug(`checking ${filename}`);
+
+          if (path.extname(filename) !== '.pug') {
+            debug(`${filename} did not have ".pug" extension`);
+            return fn();
+          }
+
+          if (pug.cache[filename]) {
+            debug(`${filename} was already cached in pug.cache`);
+            return fn();
+          }
+
+          cacheFile(client, filename, dir, fn);
+        });
+      },
+      fn
+    );
+  });
+};
+
+const preCachePugViews = (app, client, views, fn) => {
+  if (typeof app === 'undefined')
+    throw new Error(
+      'app argument must be defined (e.g. koa or express instance)'
+    );
+
+  if (typeof client !== 'object')
+    throw new Error('redis client argument must be defined');
+
+  if (typeof views === 'function') {
+    fn = views;
+    views = undefined;
+  }
+
+  if (typeof fn !== 'function')
+    fn = err => {
+      if (err) console.error(err);
+    };
+
+  debug('pre-caching pug views');
+
+  //
+  // detect if we're using koa or express/connect
+  //
+
+  // koa
+  if (typeof app.context === 'object') {
+    debug('detected koa');
+
+    // ensure that views is defined and is a string
+    if (typeof views !== 'string')
+      throw new Error('`views` directory argument must be provided for koa');
+
+    // only continue if `env` is production
+    // or if `app.cacheViews = true` is set
+    if (app.env !== 'production' && !app.context.state.cache) {
+      debug('koa env was not production and app.context.state.cache not set');
+      return fn();
+    }
+  } else {
+    //
+    // express/connect
+    //
+    debug('detected express/connect');
+
+    // only continue if caching is enabled
+    if (!app.enabled('view cache')) {
+      debug('view cache was not enabled');
+      return fn();
     }
 
-    if (typeof fn !== 'function')
-      fn = err => {
-        if (err) console.error(err);
-      };
+    // only continue if pug is the view engine
+    if (app.get('view engine') !== 'pug')
+      throw new Error(
+        `view engine was "${app.get(
+          'view engine'
+        )}" and needs to be set to "pug"`
+      );
 
-    //
-    // detect if we're using koa or express/connect
-    //
+    // views is always defined (defaults to `/views`)
+    views = typeof views === 'string' ? views : app.get('views');
+  }
 
-    // koa
-    if (typeof app.context === 'object') {
-      debug('detected koa');
-
-      // ensure that views is defined and is a string
-      if (typeof views !== 'string')
-        throw new Error('`views` directory argument must be provided for koa');
-
-      // only continue if `env` is production
-      // or if `app.cacheViews = true` is set
-      if (app.env !== 'production' && !app.context.state.cache) {
-        debug('koa env was not production and app.context.state.cache not set');
-        return fn();
-      }
-    } else {
-      //
-      // express/connect
-      //
-      debug('detected express/connect');
-
-      // only continue if caching is enabled
-      if (!app.enabled('view cache')) {
-        debug('view cache was not enabled');
-        return fn();
-      }
-
-      // only continue if pug is the view engine
-      if (app.get('view engine') !== 'pug')
-        throw new Error(
-          `view engine was "${app.get(
-            'view engine'
-          )}" and needs to be set to "pug"`
-        );
-
-      // views is always defined (defaults to `/views`)
-      views = typeof views === 'string' ? views : app.get('views');
-    }
-
-    // cache directory
-    try {
-      cacheDirectory(views);
-      debug(`cached (${Object.keys(pug.cache).length}) files`);
-      fn();
-    } catch (err) {
+  // cache directory
+  cacheDirectory(client, views, err => {
+    if (err) {
       debug(err.message);
-      fn(err);
+      return fn(err);
     }
-  };
+    debug(`cached (${Object.keys(pug.cache).length}) files`);
+    fn(null, Object.keys(pug.cache));
+  });
 };
 
 module.exports = preCachePugViews;

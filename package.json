@@ -1,18 +1,19 @@
 {
-  "name": "pre-cache-pug-views",
-  "description":
-    "Pre-cache Pug templates/views for Lad, Koa, Express, and Connect",
-  "version": "0.0.3",
+  "name": "cache-pug-templates",
+  "description": "Cache Pug templates for Lad/Koa/Express/Connect with Redis",
+  "version": "0.0.1",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
   "bugs": {
-    "url": "https://github.com/ladjs/pre-cache-pug-views/issues",
+    "url": "https://github.com/ladjs/cache-pug-templates/issues",
     "email": "niftylettuce@gmail.com"
   },
   "contributors": [
     "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)"
   ],
   "dependencies": {
-    "debug": "^3.0.1"
+    "async": "^2.5.0",
+    "debug": "^3.0.1",
+    "rev-hash": "^2.0.0"
   },
   "devDependencies": {
     "ava": "^0.22.0",
@@ -28,6 +29,7 @@
     "nyc": "^11.1.0",
     "prettier": "^1.6.1",
     "pug": "^2.0.0-rc.4",
+    "redis": "^2.8.0",
     "remark-cli": "^4.0.0",
     "remark-preset-github": "^0.0.6",
     "xo": "^0.19.0"
@@ -35,9 +37,9 @@
   "engines": {
     "node": ">=6.4"
   },
-  "homepage": "https://github.com/ladjs/pre-cache-pug-views",
+  "homepage": "https://github.com/ladjs/cache-pug-templates",
   "keywords": [
-    "pre-cache-pug-views",
+    "cache-pug-templates",
     "lass",
     "pre",
     "cache",
@@ -70,7 +72,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ladjs/pre-cache-pug-views"
+    "url": "https://github.com/ladjs/cache-pug-templates"
   },
   "scripts": {
     "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
@@ -108,6 +110,7 @@
     "space": true
   },
   "peerDependencies": {
-    "pug": "*"
+    "pug": "*",
+    "redis": "*"
   }
 }
