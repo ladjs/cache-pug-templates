@@ -2,7 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
-const debug = require('debug')('pre-cache-pug-views');
+const debug = require('debug')('cache-pug-templates');
 const async = require('async');
 const revHash = require('rev-hash');
 
