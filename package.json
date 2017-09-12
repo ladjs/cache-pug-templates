@@ -2,7 +2,7 @@
   "name": "pre-cache-pug-views",
   "description":
     "Pre-cache Pug templates/views for Lad, Koa, Express, and Connect",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
   "bugs": {
     "url": "https://github.com/ladjs/pre-cache-pug-views/issues",
