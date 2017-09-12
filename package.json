@@ -1,0 +1,112 @@
+{
+  "name": "pre-cache-pug-views",
+  "description": "Pre-cache Pug templates/views for Lad, Koa, and Express",
+  "version": "0.0.1",
+  "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
+  "bugs": {
+    "url": "https://github.com/ladjs/pre-cache-pug-views/issues",
+    "email": "niftylettuce@gmail.com"
+  },
+  "contributors": [
+    "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)"
+  ],
+  "dependencies": {
+    "debug": "^3.0.1"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "codecov": "^2.3.0",
+    "cross-env": "^5.0.5",
+    "eslint": "^4.5.0",
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-plugin-prettier": "^2.2.0",
+    "express": "^4.15.4",
+    "husky": "^0.14.3",
+    "koa": "^2.3.0",
+    "lint-staged": "^4.0.4",
+    "nyc": "^11.1.0",
+    "prettier": "^1.6.1",
+    "pug": "^2.0.0-rc.4",
+    "remark-cli": "^4.0.0",
+    "remark-preset-github": "^0.0.6",
+    "xo": "^0.19.0"
+  },
+  "engines": {
+    "node": ">=6.4"
+  },
+  "homepage": "https://github.com/ladjs/pre-cache-pug-views",
+  "keywords": [
+    "pre-cache-pug-views",
+    "lass",
+    "pre",
+    "cache",
+    "pre-cache",
+    "template",
+    "caching",
+    "deploy",
+    "deployment",
+    "pug",
+    "jade",
+    "templating",
+    "engine",
+    "koa",
+    "express",
+    "lad",
+    "helper",
+    "middleware"
+  ],
+  "license": "MIT",
+  "lint-staged": {
+    "*.{js,jsx,mjs,ts,tsx,css,less,scss,json,graphql}": [
+      "prettier --write --single-quote --trailing-comma none",
+      "git add"
+    ],
+    "*.md": ["remark . -qfo", "git add"]
+  },
+  "main": "index.js",
+  "remarkConfig": {
+    "plugins": ["preset-github"]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ladjs/pre-cache-pug-views"
+  },
+  "scripts": {
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov && codecov",
+    "lint": "xo && remark . -qfo",
+    "precommit": "lint-staged && npm test",
+    "test": "npm run lint && npm run test-coverage",
+    "test-coverage": "cross-env NODE_ENV=production nyc ava"
+  },
+  "xo": {
+    "extends": "prettier",
+    "plugins": ["prettier"],
+    "parserOptions": {
+      "sourceType": "script"
+    },
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "bracketSpacing": true,
+          "trailingComma": "none"
+        }
+      ],
+      "max-len": [
+        "error",
+        {
+          "code": 80,
+          "ignoreUrls": true
+        }
+      ],
+      "capitalized-comments": "off",
+      "camelcase": "off",
+      "no-warning-comments": "off"
+    },
+    "space": true
+  },
+  "peerDependencies": {
+    "pug": "2.x"
+  }
+}
