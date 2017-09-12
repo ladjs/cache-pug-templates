@@ -6,10 +6,6 @@ const debug = require('debug')('pre-cache-pug-views');
 // note that we use sync methods
 // since pug itself uses sync
 const cacheDirectory = dir => {
-  // we could use async/await here
-  // but we want to support node
-  // versions >= 6.4.x and <= 7.10.1
-  // since express users might be outdated
   const files = fs.readdirSync(dir);
   files.forEach(file => {
     const filePath = path.join(dir, file);
