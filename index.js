@@ -143,7 +143,7 @@ const preCachePugViews = (app, client, views, fn) => {
     // or if `app.cacheViews = true` is set
     if (app.env !== 'production' && !app.cache) {
       debug('koa env was not production and app.cache not set');
-      return fn();
+      return fn(null, []);
     }
   } else {
     //
@@ -154,7 +154,7 @@ const preCachePugViews = (app, client, views, fn) => {
     // only continue if caching is enabled
     if (!app.enabled('view cache')) {
       debug('view cache was not enabled');
-      return fn();
+      return fn(null, []);
     }
 
     // only continue if pug is the view engine
