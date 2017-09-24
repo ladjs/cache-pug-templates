@@ -14,7 +14,10 @@
 
 * [Install](#install)
 * [Usage](#usage)
-* [Callback](#callback)
+  * [Basic](#basic)
+  * [Koa](#koa)
+  * [Express](#express)
+* [Custom Callback](#custom-callback)
 * [Debugging](#debugging)
 * [Contributors](#contributors)
 * [License](#license)
@@ -37,13 +40,24 @@ yarn add cache-pug-templates
 
 ## Usage
 
-> Koa
+### Basic
 
 ```js
-const cachePugTemplates = require('cache-pug-templates');
-const Koa = require('koa');
 const path = require('path');
 const redis = require('redis');
+const cachePugTemplates = require('cache-pug-templates');
+
+const views = path.join(__dirname, 'views');
+cachePugTemplates(redisClient, views);
+```
+
+### Koa
+
+```js
+const path = require('path');
+const redis = require('redis');
+const Koa = require('koa');
+const cachePugTemplates = require('cache-pug-templates');
 
 const app = new Koa();
 const redisClient = redis.createClient();
@@ -60,13 +74,13 @@ app.listen(3000, () => {
 });
 ```
 
-> Express
+### Express
 
 ```js
-const cachePugTemplates = require('cache-pug-templates');
-const express = require('express');
 const path = require('path');
 const redis = require('redis');
+const express = require('express');
+const cachePugTemplates = require('cache-pug-templates');
 
 const app = express();
 const redisClient = redis.createClient();
@@ -82,7 +96,7 @@ app.listen(3000, () => {
 ```
 
 
-## Callback
+## Custom Callback
 
 You can also pass an optional callback function with arguments `err` and `cached`.
 

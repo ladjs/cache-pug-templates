@@ -4,7 +4,17 @@ const Koa = require('koa');
 const express = require('express');
 const redis = require('redis');
 
-const preCachePugViews = require('../');
+const cachePugTemplates = require('../');
+
+test.cb('email-templates', t => {
+  const redisClient = redis.createClient();
+  const views = path.join(__dirname, 'fixtures', 'views');
+  cachePugTemplates(redisClient, views, (err, cached) => {
+    if (err) return t.end(err);
+    t.is(cached.length, 3);
+    t.end();
+  });
+});
 
 test.cb('koa', t => {
   const app = new Koa();
@@ -16,7 +26,7 @@ test.cb('koa', t => {
   const views = path.join(__dirname, 'fixtures', 'views');
 
   app.listen(() => {
-    preCachePugViews(app, redisClient, views, (err, cached) => {
+    cachePugTemplates(app, redisClient, views, (err, cached) => {
       if (err) return t.end(err);
       t.is(cached.length, 3);
       t.end();
@@ -30,7 +40,7 @@ test.cb('express', t => {
   app.set('views', path.join(__dirname, 'fixtures', 'views'));
   app.set('view engine', 'pug');
   app.listen(() => {
-    preCachePugViews(app, redisClient, (err, cached) => {
+    cachePugTemplates(app, redisClient, (err, cached) => {
       if (err) return t.end(err);
       t.is(cached.length, 3);
       t.end();

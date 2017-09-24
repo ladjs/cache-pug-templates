@@ -113,6 +113,15 @@ const preCachePugViews = (app, client, views, fn) => {
       'app argument must be defined (e.g. koa or express instance)'
     );
 
+  // support client as first argument
+  let pure = false;
+  if (app.constructor && app.constructor.name === 'RedisClient') {
+    fn = views;
+    views = client;
+    client = app;
+    pure = true;
+  }
+
   if (typeof client !== 'object')
     throw new Error('redis client argument must be defined');
 
@@ -146,7 +155,7 @@ const preCachePugViews = (app, client, views, fn) => {
       debug('koa env was not production and app.cache not set');
       return fn(null, []);
     }
-  } else {
+  } else if (!pure) {
     //
     // express/connect
     //
