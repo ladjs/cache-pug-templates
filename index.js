@@ -168,12 +168,13 @@ const preCachePugViews = (app, client, views, fn) => {
     }
 
     // only continue if pug is the view engine
-    if (app.get('view engine') !== 'pug')
-      throw new Error(
-        `view engine was "${app.get(
-          'view engine'
-        )}" and needs to be set to "pug"`
-      );
+    if (app.get('view engine') !== 'pug') {
+      const errorMessage = `view engine was "${app.get(
+        'view engine'
+      )}" and needs to be set to "pug"`;
+      debug(errorMessage);
+      throw new Error(errorMessage);
+    }
 
     // views is always defined (defaults to `/views`)
     views = typeof views === 'string' ? views : app.get('views');
