@@ -10,7 +10,7 @@ test.cb('email-templates', t => {
   const redisClient = redis.createClient();
   const views = path.join(__dirname, 'fixtures', 'views');
   cachePugTemplates(redisClient, views, (err, cached) => {
-    if (err) return t.end(err);
+    t.ifError(err);
     t.is(cached.length, 3);
     t.end();
   });
@@ -27,7 +27,7 @@ test.cb('koa', t => {
 
   app.listen(() => {
     cachePugTemplates(app, redisClient, views, (err, cached) => {
-      if (err) return t.end(err);
+      t.ifError(err);
       t.is(cached.length, 3);
       t.end();
     });
@@ -41,9 +41,27 @@ test.cb('express', t => {
   app.set('view engine', 'pug');
   app.listen(() => {
     cachePugTemplates(app, redisClient, (err, cached) => {
-      if (err) return t.end(err);
+      t.ifError(err);
       t.is(cached.length, 3);
       t.end();
     });
+  });
+});
+
+test.cb('throws on unsupported view engine', t => {
+  const app = express();
+  const redisClient = redis.createClient();
+  app.set('views', path.join(__dirname, 'fixtures', 'views'));
+  app.set('view engine', 'ejs');
+  app.set('view cache', true);
+  app.listen(() => {
+    const error = t.throws(() => {
+      cachePugTemplates(app, redisClient, err => {
+        throw err;
+      });
+    });
+
+    t.is(error.message, `view engine was "ejs" and needs to be set to "pug"`);
+    t.end();
   });
 });
