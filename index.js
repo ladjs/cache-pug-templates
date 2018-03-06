@@ -48,7 +48,7 @@ const cacheFile = (client, filename, dir, fn) => {
           // so delete key hash and start over
           if (!compiledStr) {
             debug(`key hash existed for ${filename} but its str was missing`);
-            client.del(keyHash, err => {
+            client.del(key, err => {
               if (err) return fn(err);
               debug(`deleted existing key for ${filename} and re-creating`);
               cacheFile(client, filename, dir, fn);
