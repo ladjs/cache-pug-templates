@@ -6,7 +6,8 @@ const debug = require('debug')('cache-pug-templates');
 const async = require('async');
 const revHash = require('rev-hash');
 
-const writeCache = (client, filename, key, hash, fn) => {
+// eslint-disable-next-line max-params
+const writeCache = (client, filename, key, hash, str, fn) => {
   debug('compiling template with pug.compile and storing to redis');
   const tmpl = pug.compile(str, { filename });
   pug.cache[filename] = tmpl;
@@ -42,7 +43,7 @@ const cacheFile = (client, filename, dir, fn) => {
         // otherwise delete it and start over
         if (keyHash !== hash) {
           debug(`hash changed for ${filename} so we are recompiling`);
-          writeCache(client, filename, key, hash, fn);
+          writeCache(client, filename, key, hash, str, fn);
           return;
         }
 
@@ -53,7 +54,7 @@ const cacheFile = (client, filename, dir, fn) => {
           // so delete key hash and start over
           if (!compiledStr) {
             debug(`key hash existed for ${filename} but its str was missing`);
-            writeCache(client, filename, key, hash, fn);
+            writeCache(client, filename, key, hash, str, fn);
             return;
           }
 
@@ -64,7 +65,7 @@ const cacheFile = (client, filename, dir, fn) => {
         });
         return;
       }
-      writeCache(client, filename, key, hash, fn);
+      writeCache(client, filename, key, hash, str, fn);
     });
   });
 };
