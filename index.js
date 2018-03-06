@@ -6,6 +6,15 @@ const debug = require('debug')('cache-pug-templates');
 const async = require('async');
 const revHash = require('rev-hash');
 
+const writeCache = (client, filename, key, hash, fn) => {
+  debug('compiling template with pug.compile and storing to redis');
+  const tmpl = pug.compile(str, { filename });
+  pug.cache[filename] = tmpl;
+  async.parallel(
+    [fn => client.set(key, hash, fn), fn => client.set(hash, tmpl, fn)],
+    fn
+  );
+};
 const cacheFile = (client, filename, dir, fn) => {
   fs.readFile(filename, 'utf8', (err, str) => {
     if (err) return fn(err);
@@ -33,11 +42,7 @@ const cacheFile = (client, filename, dir, fn) => {
         // otherwise delete it and start over
         if (keyHash !== hash) {
           debug(`hash changed for ${filename} so we are recompiling`);
-          client.del(key, err => {
-            if (err) return fn(err);
-            debug(`deleted old hash for ${filename} and starting over`);
-            cacheFile(client, filename, dir, fn);
-          });
+          writeCache(client, filename, key, hash, fn);
           return;
         }
 
@@ -48,11 +53,7 @@ const cacheFile = (client, filename, dir, fn) => {
           // so delete key hash and start over
           if (!compiledStr) {
             debug(`key hash existed for ${filename} but its str was missing`);
-            client.del(keyHash, err => {
-              if (err) return fn(err);
-              debug(`deleted existing key for ${filename} and re-creating`);
-              cacheFile(client, filename, dir, fn);
-            });
+            writeCache(client, filename, key, hash, fn);
             return;
           }
 
@@ -63,14 +64,7 @@ const cacheFile = (client, filename, dir, fn) => {
         });
         return;
       }
-
-      debug('compiling template with pug.compile and storing to redis');
-      const tmpl = pug.compile(str, { filename });
-      pug.cache[filename] = tmpl;
-      async.parallel(
-        [fn => client.set(key, hash, fn), fn => client.set(hash, tmpl, fn)],
-        fn
-      );
+      writeCache(client, filename, key, hash, fn);
     });
   });
 };
