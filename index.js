@@ -12,7 +12,7 @@ const writeCache = (client, filename, key, hash, str, fn) => {
   const tmpl = pug.compile(str, { filename });
   pug.cache[filename] = tmpl;
   async.parallel(
-    [fn => client.set(key, hash, fn), fn => client.set(hash, tmpl, fn)],
+    [fn => client.set(key, hash, fn), fn => client.set(hash, `(${tmpl})`, fn)],
     fn
   );
 };
