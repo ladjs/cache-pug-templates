@@ -4,7 +4,7 @@ const Koa = require('koa');
 const express = require('express');
 const redis = require('redis');
 
-const cachePugTemplates = require('../');
+const cachePugTemplates = require('..');
 
 test.cb('email-templates', t => {
   const redisClient = redis.createClient();

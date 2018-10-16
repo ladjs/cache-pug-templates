@@ -6,6 +6,11 @@ const debug = require('debug')('cache-pug-templates');
 const async = require('async');
 const revHash = require('rev-hash');
 
+// <https://github.com/pugjs/pug/issues/3065>
+Object.entries(pug.runtime).forEach((key, value) => {
+  pug[key] = value;
+});
+
 // eslint-disable-next-line max-params
 const writeCache = (client, filename, key, hash, str, fn) => {
   debug('compiling template with pug.compile and storing to redis');

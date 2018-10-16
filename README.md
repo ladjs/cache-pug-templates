@@ -47,7 +47,10 @@ const path = require('path');
 const redis = require('redis');
 const cachePugTemplates = require('cache-pug-templates');
 
+const redisClient = redis.createClient();
+
 const views = path.join(__dirname, 'views');
+
 cachePugTemplates(redisClient, views);
 ```
 

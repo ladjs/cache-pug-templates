@@ -11,29 +11,29 @@
     "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)"
   ],
   "dependencies": {
-    "async": "^2.5.0",
-    "debug": "^3.0.1",
+    "async": "^2.6.1",
+    "debug": "^4.1.0",
     "rev-hash": "^2.0.0"
   },
   "devDependencies": {
-    "ava": "^0.22.0",
-    "codecov": "^2.3.0",
-    "cross-env": "^5.0.5",
-    "ejs": "^2.5.7",
-    "eslint": "^4.5.0",
-    "eslint-config-prettier": "^2.3.0",
-    "eslint-plugin-prettier": "^2.2.0",
-    "express": "^4.15.4",
-    "husky": "^0.14.3",
-    "koa": "^2.3.0",
-    "lint-staged": "^4.0.4",
-    "nyc": "^11.1.0",
-    "prettier": "^1.6.1",
-    "pug": "^2.0.0-rc.4",
+    "ava": "^0.25.0",
+    "codecov": "^3.1.0",
+    "cross-env": "^5.2.0",
+    "ejs": "^2.6.1",
+    "eslint": "^5.7.0",
+    "eslint-config-prettier": "^3.1.0",
+    "eslint-plugin-prettier": "^3.0.0",
+    "express": "^4.16.4",
+    "husky": "^1.1.2",
+    "koa": "^2.5.3",
+    "lint-staged": "^7.3.0",
+    "nyc": "^13.1.0",
+    "prettier": "^1.14.3",
+    "pug": "^2.0.3",
     "redis": "^2.8.0",
-    "remark-cli": "^4.0.0",
-    "remark-preset-github": "^0.0.6",
-    "xo": "^0.19.0"
+    "remark-cli": "^5.0.0",
+    "remark-preset-github": "^0.0.9",
+    "xo": "^0.23.0"
   },
   "engines": {
     "node": ">=6.4"
@@ -65,11 +65,16 @@
       "prettier --write --single-quote --trailing-comma none",
       "git add"
     ],
-    "*.md": ["remark . -qfo", "git add"]
+    "*.md": [
+      "remark . -qfo",
+      "git add"
+    ]
   },
   "main": "index.js",
   "remarkConfig": {
-    "plugins": ["preset-github"]
+    "plugins": [
+      "preset-github"
+    ]
   },
   "repository": {
     "type": "git",
@@ -84,7 +89,9 @@
   },
   "xo": {
     "extends": "prettier",
-    "plugins": ["prettier"],
+    "plugins": [
+      "prettier"
+    ],
     "parserOptions": {
       "sourceType": "script"
     },
