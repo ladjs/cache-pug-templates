@@ -97,7 +97,7 @@ app.listen(3000, () => {
 
 ## Custom Callback
 
-You can also pass an optional callback function with arguments `err` and `cached`.
+You can also pass an optional callback function with arguments `err` and `queuedFiles`.
 
 The argument `queuedFiles` is an Array of filenames that have been queued to be cached.
 
