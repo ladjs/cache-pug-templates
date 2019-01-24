@@ -7,7 +7,7 @@
 [![made with lass](https://img.shields.io/badge/made_with-lass-95CC28.svg)](https://lass.js.org)
 [![license](https://img.shields.io/github/license/ladjs/cache-pug-templates.svg)](<>)
 
-> Cache [Pug][] templates for [Lad][]/[Koa][]/[Express][]/[Connect][] with [Redis][]
+> Cache [Pug][] templates for [Lad][]/[Koa][]/[Express][]/[Connect][].
 
 
 ## Table of Contents
@@ -44,26 +44,22 @@ yarn add cache-pug-templates
 
 ```js
 const path = require('path');
-const redis = require('redis');
-const cachePugTemplates = require('cache-pug-templates');
-
-const redisClient = redis.createClient();
+const CachePugTemplates = require('cache-pug-templates');
 
 const views = path.join(__dirname, 'views');
 
-cachePugTemplates(redisClient, views);
+const cache = CachePugTemplates({ views });
+cache.start();
 ```
 
 ### Koa
 
 ```js
 const path = require('path');
-const redis = require('redis');
 const Koa = require('koa');
-const cachePugTemplates = require('cache-pug-templates');
+const CachePugTemplates = require('cache-pug-templates');
 
 const app = new Koa();
-const redisClient = redis.createClient();
 
 // optional (e.g. if you want to cache in non-production)
 // app.cache = true;
@@ -73,7 +69,8 @@ const redisClient = redis.createClient();
 const views = path.join(__dirname, 'views');
 
 app.listen(3000, () => {
-  cachePugTemplates(app, redisClient, views);
+  const cache = new CachePugTemplates({ app, views });
+  cache.start();
 });
 ```
 
@@ -81,12 +78,10 @@ app.listen(3000, () => {
 
 ```js
 const path = require('path');
-const redis = require('redis');
 const express = require('express');
-const cachePugTemplates = require('cache-pug-templates');
+const CachePugTemplates = require('cache-pug-templates');
 
 const app = express();
-const redisClient = redis.createClient();
 
 // optional (by default express defaults to `./views`)
 // app.set('views', path.join(__dirname, 'views'));
@@ -94,7 +89,8 @@ const redisClient = redis.createClient();
 app.set('view engine', 'pug');
 
 app.listen(3000, () => {
-  cachePugTemplates(app, redisClient, views);
+  const cache = new CachePugTemplates({ app, views });
+  cache.start();
 });
 ```
 
@@ -103,15 +99,19 @@ app.listen(3000, () => {
 
 You can also pass an optional callback function with arguments `err` and `cached`.
 
-The argument `cached` is an Array of filenames that have been cached (from `Object.keys(pug.cache)`).
+The argument `queuedFiles` is an Array of filenames that have been queued to be cached.
 
 ```js
 // ...
 
 app.listen(3000, () => {
-  cachePugTemplates(app, redisClient, (err, cached) => {
+  const cache = new CachePugTemplates({ app });
+  cache.start((err, queuedFiles) => {
     if (err) throw err;
-    console.log(`successfully cached (${cached.length}) files`);
+    console.log(`successfully queued (${queuedFiles.length}) files`);
+    setTimeout(() => {
+      console.log(`pug cached (${Object.keys(pug.cache).length}) files`);
+    }, 5000);
   });
 });
 ```
@@ -124,9 +124,13 @@ Note that with Koa you'll need to pass the `views` argument as well:
 const views = path.join(__dirname, 'views');
 
 app.listen(3000, () => {
-  cachePugTemplates(app, redisClient, views, (err, cached) => {
+  const cache = new CachePugTemplates({ app, views });
+  cache.start((err, queuedFiles) => {
     if (err) throw err;
-    console.log(`successfully cached (${cached.length}) files`);
+    console.log(`successfully queued (${queuedFiles.length}) files`);
+    setTimeout(() => {
+      console.log(`pug cached (${Object.keys(pug.cache).length}) files`);
+    }, 5000);
   });
 });
 ```
@@ -178,5 +182,3 @@ console.log('pug cached files', Object.keys(pug.cache));
 [express]: https://expressjs.com/
 
 [connect]: https://github.com/senchalabs/connect
-
-[redis]: https://redis.io/
