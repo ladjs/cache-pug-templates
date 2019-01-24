@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
   "ava": {
-    "verbose": true
+    "verbose": true,
+    "timeout": "6s"
   },
   "bugs": {
     "url": "https://github.com/ladjs/cache-pug-templates/issues",

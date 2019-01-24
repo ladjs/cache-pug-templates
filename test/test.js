@@ -22,7 +22,7 @@ test.cb('rendering works', t => {
       t.log(`str 2 ${pug.compileFile(home)()}`);
       t.is(pug.cache[home](), pug.compileFile(home)());
       t.end();
-    }, 3000);
+    }, 5000);
   });
 });
 
@@ -36,7 +36,7 @@ test.cb('email-templates', t => {
     setTimeout(() => {
       t.is(Object.keys(pug.cache).length, 3);
       t.end();
-    }, 3000);
+    }, 5000);
   });
 });
 
@@ -55,7 +55,7 @@ test.cb('koa', t => {
       setTimeout(() => {
         t.is(Object.keys(pug.cache).length, 3);
         t.end();
-      }, 3000);
+      }, 5000);
     });
   });
 });
@@ -71,7 +71,7 @@ test.cb('express', t => {
       setTimeout(() => {
         t.is(Object.keys(pug.cache).length, 3);
         t.end();
-      }, 3000);
+      }, 5000);
     });
   });
 });
