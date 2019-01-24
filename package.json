@@ -1,7 +1,7 @@
 {
   "name": "cache-pug-templates",
   "description": "Cache Pug templates for Lad/Koa/Express/Connect",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
   "bugs": {
     "url": "https://github.com/ladjs/cache-pug-templates/issues",
