@@ -113,7 +113,8 @@ class CachePugTemplates {
 
     cli.on('close', code => {
       debug(`child worker for pug ${filename} exited with code ${code}`);
-      if (tmpl) pug.cache[filename] = tmpl;
+      tmpl = tmpl.trim();
+      if (tmpl) pug.cache[filename] = eval(`(${tmpl})`);
       delete this.queuedFiles[filename];
       fn();
     });

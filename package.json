@@ -3,6 +3,9 @@
   "description": "Cache Pug templates for Lad/Koa/Express/Connect",
   "version": "1.0.0",
   "author": "Nick Baugh <niftylettuce@gmail.com> (http://niftylettuce.com/)",
+  "ava": {
+    "verbose": true
+  },
   "bugs": {
     "url": "https://github.com/ladjs/cache-pug-templates/issues",
     "email": "niftylettuce@gmail.com"

@@ -6,6 +6,26 @@ const express = require('express');
 
 const CachePugTemplates = require('..');
 
+test.cb('rendering works', t => {
+  const views = path.join(__dirname, 'fixtures', 'views');
+  const cache = new CachePugTemplates({
+    views
+  });
+  cache.start(err => {
+    t.falsy(err);
+    setTimeout(() => {
+      t.is(Object.keys(pug.cache).length, 3);
+      const home = path.join(views, 'home.pug');
+      t.log(`length 1 ${pug.cache[home]().length}`);
+      t.log(`str 1 ${pug.cache[home]()}`);
+      t.log(`length 2 ${pug.compileFile(home)().length}`);
+      t.log(`str 2 ${pug.compileFile(home)()}`);
+      t.is(pug.cache[home](), pug.compileFile(home)());
+      t.end();
+    }, 3000);
+  });
+});
+
 test.cb('email-templates', t => {
   const views = path.join(__dirname, 'fixtures', 'views');
   const cache = new CachePugTemplates({
