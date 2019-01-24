@@ -16,9 +16,7 @@
   ],
   "dependencies": {
     "async": "^2.6.1",
-    "debug": "^4.1.1",
-    "pug-cli": "git+https://github.com/niftylettuce/pug-cli.git",
-    "shx": "^0.3.2"
+    "debug": "^4.1.1"
   },
   "devDependencies": {
     "ava": "^1.1.0",

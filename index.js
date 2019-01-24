@@ -1,4 +1,3 @@
-const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const pug = require('pug');
@@ -15,7 +14,7 @@ class CachePugTemplates {
     this.config = {
       app: false,
       views: false,
-      concurrency: 2,
+      concurrency: 1,
       ...config
     };
 
@@ -74,7 +73,8 @@ class CachePugTemplates {
       (filename, fn) => {
         this.writeCache(filename, fn);
       },
-      () => {
+      err => {
+        if (err) console.error(err);
         debug('done with queue');
       }
     );
@@ -82,67 +82,16 @@ class CachePugTemplates {
 
   writeCache(filename, fn) {
     debug(`compiling template located at ${filename}`);
-
-    const cat = spawn('node_modules/.bin/shx', ['cat', filename], {
-      cwd: __dirname
-    });
-
-    const cli = spawn(
-      'node_modules/.bin/pug',
-      ['--return-function-only', '-p', filename],
-      {
-        cwd: __dirname
+    fs.readFile(filename, 'utf8', (err, str) => {
+      if (err) return fn(err);
+      try {
+        const options = { cache: true, filename };
+        if (pug.cache[filename]) return fn();
+        pug.cache[filename] = pug.compile(str, options);
+        fn();
+      } catch (err2) {
+        fn(err2);
       }
-    );
-
-    let tmpl = '';
-
-    cat.on('close', code => {
-      debug(`child worker for cat ${filename} exited with code ${code}`);
-      cli.stdin.end();
-    });
-
-    cat.on('error', err => {
-      debug(`child worker for cat ${filename} had error ${err}`);
-      console.error(err);
-    });
-
-    cat.stdout.on('data', data => {
-      cli.stdin.write(data);
-    });
-
-    cli.on('close', code => {
-      debug(`child worker for pug ${filename} exited with code ${code}`);
-      (function() {
-        try {
-          tmpl = tmpl.trim();
-          if (tmpl) {
-            tmpl = tmpl.replace('function template(locals) {', '');
-            tmpl = tmpl.replace('return pug_html;}', 'return pug_html;');
-            // eslint-disable-next-line no-new-func
-            pug.cache[filename] = new Function('locals', tmpl);
-          }
-        } catch (err) {
-          err.message = `${filename}: ${err.message}`;
-          console.error(err);
-        }
-      })();
-
-      delete this.queuedFiles[filename];
-      fn();
-    });
-
-    cli.on('error', err => {
-      debug(`child worker for pug ${filename} had error ${err}`);
-      console.error(err);
-    });
-
-    cli.stdout.on('data', data => {
-      tmpl += data.toString();
-    });
-
-    cli.stderr.on('data', data => {
-      debug(`child worker for pug ${filename} had an error ${data}`);
     });
   }
 
