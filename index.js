@@ -105,6 +105,7 @@ class CachePugTemplates {
 
     cat.on('error', err => {
       debug(`child worker for cat ${filename} had error ${err}`);
+      console.error(err);
     });
 
     cat.stdout.on('data', data => {
@@ -113,14 +114,23 @@ class CachePugTemplates {
 
     cli.on('close', code => {
       debug(`child worker for pug ${filename} exited with code ${code}`);
-      tmpl = tmpl.trim();
-      if (tmpl) pug.cache[filename] = eval(`(${tmpl})`);
+      (function() {
+        try {
+          tmpl = tmpl.trim();
+          if (tmpl) pug.cache[filename] = eval(`(${tmpl})`);
+        } catch (err) {
+          err.message = `${filename}: ${err.message}`;
+          console.error(err);
+        }
+      })();
+
       delete this.queuedFiles[filename];
       fn();
     });
 
     cli.on('error', err => {
       debug(`child worker for pug ${filename} had error ${err}`);
+      console.error(err);
     });
 
     cli.stdout.on('data', data => {
