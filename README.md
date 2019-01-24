@@ -135,7 +135,7 @@ app.listen(3000, () => {
 });
 ```
 
-By default this callback simply `console.error` the `err` (if any).
+By default this callback simply throws the `err` (if any).
 
 
 ## Debugging
