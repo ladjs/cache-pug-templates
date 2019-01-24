@@ -1,4 +1,3 @@
-/* eslint no-eval: 0 */
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -117,7 +116,12 @@ class CachePugTemplates {
       (function() {
         try {
           tmpl = tmpl.trim();
-          if (tmpl) pug.cache[filename] = eval(`(${tmpl})`);
+          if (tmpl) {
+            tmpl = tmpl.replace('function template(locals) {', '');
+            tmpl = tmpl.replace('return pug_html;}', 'return pug_html;');
+            // eslint-disable-next-line no-new-func
+            pug.cache[filename] = new Function('locals', tmpl);
+          }
         } catch (err) {
           err.message = `${filename}: ${err.message}`;
           console.error(err);
