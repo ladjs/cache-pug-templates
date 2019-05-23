@@ -85,7 +85,7 @@ class CachePugTemplates {
     fs.readFile(filename, 'utf8', (err, str) => {
       if (err) return fn(err);
       try {
-        const options = { cache: true, filename };
+        const options = { cache: true, basedir: this.config.basedir, filename };
         if (pug.cache[filename]) return fn();
         pug.cache[filename] = pug.compile(str, options);
         fn();
