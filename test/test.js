@@ -28,18 +28,6 @@ test.cb('rendering works', t => {
   }, 3000);
 });
 
-test.cb('email-templates', t => {
-  const views = path.join(__dirname, 'fixtures', 'views');
-  const cache = new CachePugTemplates({
-    views
-  });
-  cache.start();
-  setTimeout(() => {
-    t.is(Object.keys(pug.cache).length, 3);
-    t.end();
-  }, 3000);
-});
-
 test.cb('koa', t => {
   const app = new Koa();
 
