@@ -86,9 +86,6 @@
     }
   },
   "main": "index.js",
-  "os": [
-    "!win32"
-  ],
   "peerDependencies": {
     "pug": "*"
   },
