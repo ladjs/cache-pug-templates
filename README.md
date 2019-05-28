@@ -17,6 +17,7 @@
   * [Basic](#basic)
   * [Koa](#koa)
   * [Express](#express)
+* [Options](#options)
 * [Custom Callback](#custom-callback)
 * [Debugging](#debugging)
 * [Contributors](#contributors)
@@ -48,7 +49,7 @@ const CachePugTemplates = require('cache-pug-templates');
 
 const views = path.join(__dirname, 'views');
 
-const cache = CachePugTemplates({ views });
+const cache = new CachePugTemplates({ views });
 cache.start();
 ```
 
@@ -95,6 +96,17 @@ app.listen(3000, () => {
 ```
 
 
+## Options
+
+* `app` (Object) - an instance of Koa, Express, or Connect
+* `views` (String or Array) - a file directory path (or an Array of file directory paths) (if you pass an Express app instance as the `app` option, this will be automatically populated to your applications `views` configuration option via `app.get('views')`)
+* `logger` (Object) - a logger, defaults to `console` (we recommend using [Cabin][] for your logger)
+* `callback` (Function) - defaults to `false` (no operation), but if a function is provided then it will be invoked with two arguments, `file` (String) and `template` (Function)
+* `cache` (Boolean) - defaults to `true`, whether or not to cache templates automatically if `cache.start()` is called (useful if you are writing tests or have a custom approach using `callback` function)
+* `concurrency` (Number) - number of concurrent files that can be cached per `interval` in parallel (defaults to `1`)
+* `interval` (Number) - duration of time in (milliseconds) to limit concurrency for (e.g. `1 cached file every 1000ms` is the default), this value's default is `1000`
+
+
 ## Custom Callback
 
 You can also pass an optional callback function with arguments `err` and `queuedFiles`.
@@ -106,13 +118,7 @@ The argument `queuedFiles` is an Array of filenames that have been queued to be 
 
 app.listen(3000, () => {
   const cache = new CachePugTemplates({ app });
-  cache.start((err, queuedFiles) => {
-    if (err) throw err;
-    console.log(`successfully queued (${queuedFiles.length}) files`);
-    setTimeout(() => {
-      console.log(`pug cached (${Object.keys(pug.cache).length}) files`);
-    }, 5000);
-  });
+  cache.start();
 });
 ```
 
@@ -125,13 +131,7 @@ const views = path.join(__dirname, 'views');
 
 app.listen(3000, () => {
   const cache = new CachePugTemplates({ app, views });
-  cache.start((err, queuedFiles) => {
-    if (err) throw err;
-    console.log(`successfully queued (${queuedFiles.length}) files`);
-    setTimeout(() => {
-      console.log(`pug cached (${Object.keys(pug.cache).length}) files`);
-    }, 5000);
-  });
+  cache.start();
 });
 ```
 
@@ -182,3 +182,5 @@ console.log('pug cached files', Object.keys(pug.cache));
 [express]: https://expressjs.com/
 
 [connect]: https://github.com/senchalabs/connect
+
+[cabin]: https://cabinjs.com
