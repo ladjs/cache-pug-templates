@@ -18,7 +18,6 @@
   * [Koa](#koa)
   * [Express](#express)
 * [Options](#options)
-* [Custom Callback](#custom-callback)
 * [Debugging](#debugging)
 * [Contributors](#contributors)
 * [License](#license)
@@ -105,37 +104,6 @@ app.listen(3000, () => {
 * `cache` (Boolean) - defaults to `true`, whether or not to cache templates automatically if `cache.start()` is called (useful if you are writing tests or have a custom approach using `callback` function)
 * `concurrency` (Number) - number of concurrent files that can be cached per `interval` in parallel (defaults to `1`)
 * `interval` (Number) - duration of time in (milliseconds) to limit concurrency for (e.g. `1 cached file every 1000ms` is the default), this value's default is `1000`
-
-
-## Custom Callback
-
-You can also pass an optional callback function with arguments `err` and `queuedFiles`.
-
-The argument `queuedFiles` is an Array of filenames that have been queued to be cached.
-
-```js
-// ...
-
-app.listen(3000, () => {
-  const cache = new CachePugTemplates({ app });
-  cache.start();
-});
-```
-
-Note that with Koa you'll need to pass the `views` argument as well:
-
-```js
-// ...
-
-const views = path.join(__dirname, 'views');
-
-app.listen(3000, () => {
-  const cache = new CachePugTemplates({ app, views });
-  cache.start();
-});
-```
-
-By default this callback simply throws the `err` (if any).
 
 
 ## Debugging
