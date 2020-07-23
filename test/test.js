@@ -10,7 +10,7 @@ test.beforeEach(() => {
   pug.cache = {};
 });
 
-test.cb('rendering works', t => {
+test.cb('rendering works', (t) => {
   const views = path.join(__dirname, 'fixtures', 'views');
   const cache = new CachePugTemplates({
     views
@@ -28,7 +28,7 @@ test.cb('rendering works', t => {
   }, 3000);
 });
 
-test.cb('koa', t => {
+test.cb('koa', (t) => {
   const app = new Koa();
 
   // optional (e.g. if you want to cache in non-production)
@@ -46,7 +46,7 @@ test.cb('koa', t => {
   });
 });
 
-test.cb('express', t => {
+test.cb('express', (t) => {
   const app = express();
   app.set('views', path.join(__dirname, 'fixtures', 'views'));
   app.set('view engine', 'pug');
@@ -60,7 +60,7 @@ test.cb('express', t => {
   });
 });
 
-test.cb('throws on unsupported view engine', t => {
+test.cb('throws on unsupported view engine', (t) => {
   const app = express();
   app.set('views', path.join(__dirname, 'fixtures', 'views'));
   app.set('view engine', 'ejs');

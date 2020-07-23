@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const autoBind = require('auto-bind');
 const pug = require('pug');
 const debug = require('debug')('cache-pug-templates');
 const _ = require('lodash');
@@ -67,7 +66,11 @@ class CachePugTemplates {
 
     debug(this.config);
 
-    autoBind(this);
+    this.writeCache = this.writeCache.bind(this);
+    this.cacheFile = this.cacheFile.bind(this);
+    this.getFilename = this.getFilename.bind(this);
+    this.cacheDirectory = this.cacheDirectory.bind(this);
+    this.start = this.start.bind(this);
 
     this.rateLimitedCacheFile = rateLimit(
       this.config.concurrency,
@@ -78,7 +81,7 @@ class CachePugTemplates {
 
   writeCache(filename) {
     debug(`compiling template located at ${filename}`);
-    fs.readFile(filename, 'utf8', (err, str) => {
+    fs.readFile(filename, 'utf8', (err, string) => {
       if (err) return this.config.logger.error(err);
       const options = { cache: true, filename };
       if (pug.cache[filename])
@@ -87,7 +90,7 @@ class CachePugTemplates {
         );
       // <https://github.com/pugjs/pug/issues/2206>
       setImmediate(() => {
-        const template = pug.compile(str, options);
+        const template = pug.compile(string, options);
         if (this.config.cache) {
           debug(`caching ${filename}`);
           try {
@@ -137,15 +140,15 @@ class CachePugTemplates {
   }
 
   getFilename(dir) {
-    return file => path.join(dir, file);
+    return (file) => path.join(dir, file);
   }
 
   cacheDirectory(dir) {
     fs.readdir(dir, (err, files) => {
       if (err) return this.config.logger.error(err);
-      for (let i = 0; i < files.length; i++) {
+      for (const file of files) {
         setImmediate(() => {
-          const filename = this.getFilename(dir)(files[i]);
+          const filename = this.getFilename(dir)(file);
           this.rateLimitedCacheFile(filename);
         });
       }
